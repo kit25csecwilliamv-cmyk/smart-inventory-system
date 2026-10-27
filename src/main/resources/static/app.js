@@ -1,11 +1,59 @@
-const API='/api/products';let products=[],bill=[];const money=n=>new Intl.NumberFormat('en-IN',{style:'currency',currency:'INR'}).format(Number(n)||0);
-async function api(url,options={}){const r=await fetch(url,{headers:{'Content-Type':'application/json'},...options});if(!r.ok){let m='Request failed';try{m=(await r.json()).message||m}catch{}throw Error(m)}return r.status===204?null:r.json()}
-async function load(){try{products=await api(API);render()}catch(e){document.getElementById('message').textContent=e.message}}
-function render(){document.getElementById('count').textContent=products.length;document.getElementById('units').textContent=products.reduce((s,p)=>s+p.quantity,0);document.getElementById('value').textContent=money(products.reduce((s,p)=>s+p.price*p.quantity,0));const body=document.getElementById('products');body.replaceChildren();if(!products.length){body.innerHTML='<tr><td colspan="5">No products yet. Add your first product above.</td></tr>'}
-products.forEach(p=>{const tr=body.insertRow();[p.name,p.category||'—',money(p.price),p.quantity].forEach(v=>tr.insertCell().textContent=v);const td=tr.insertCell();const up=document.createElement('button');up.textContent='Update stock';up.onclick=async()=>{const v=prompt('New stock quantity:',p.quantity);if(v===null)return;const n=Number(v);if(!Number.isInteger(n)||n<0)return alert('Enter a whole number, 0 or higher.');try{await api(`${API}/${p.id}/stock`,{method:'PUT',body:JSON.stringify({quantity:n})});load()}catch(e){alert(e.message)}};const del=document.createElement('button');del.textContent='Delete';del.className='danger';del.onclick=async()=>{if(confirm(`Delete ${p.name}?`)){await api(`${API}/${p.id}`,{method:'DELETE'});bill=bill.filter(i=>i.id!==p.id);drawBill();load()}};td.append(up,del)});
-const sel=document.getElementById('billproduct'),old=sel.value;sel.replaceChildren();products.filter(p=>p.quantity>0).forEach(p=>{const o=document.createElement('option');o.value=p.id;o.textContent=`${p.name} — ${money(p.price)} (${p.quantity} in stock)`;sel.append(o)});if([...sel.options].some(o=>o.value===old))sel.value=old}
-document.getElementById('form').onsubmit=async e=>{e.preventDefault();const p={name:document.getElementById('name').value.trim(),category:document.getElementById('category').value.trim(),price:Number(document.getElementById('price').value),quantity:Number(document.getElementById('quantity').value)};try{await api(API,{method:'POST',body:JSON.stringify(p)});e.target.reset();document.getElementById('message').textContent='Product added successfully.';load()}catch(err){document.getElementById('message').textContent=err.message}};
-document.getElementById('addbill').onclick=()=>{const p=products.find(x=>x.id===Number(document.getElementById('billproduct').value)),q=Number(document.getElementById('billqty').value);if(!p||!Number.isInteger(q)||q<1)return alert('Choose a product and valid quantity.');const old=bill.find(x=>x.id===p.id);if((old?.quantity||0)+q>p.quantity)return alert('Quantity exceeds available stock.');if(old)old.quantity+=q;else bill.push({...p,quantity:q});drawBill()};
-document.getElementById('clear').onclick=()=>{bill=[];drawBill()};
-function drawBill(){const body=document.getElementById('bill');body.replaceChildren();bill.forEach(p=>{const tr=body.insertRow();[p.name,p.quantity,money(p.price),money(p.price*p.quantity)].forEach(v=>tr.insertCell().textContent=v);const b=document.createElement('button');b.textContent='Remove';b.className='secondary';b.onclick=()=>{bill=bill.filter(x=>x.id!==p.id);drawBill()};tr.insertCell().append(b)});document.getElementById('total').textContent=money(bill.reduce((s,p)=>s+p.price*p.quantity,0))}
-load();
+
+const form = document.getElementById("productForm");
+const products = document.getElementById("products");
+
+let inventory = [];
+
+function renderInventory() {
+    products.innerHTML = "";
+
+    inventory.forEach((item, index) => {
+        const row = document.createElement("tr");
+
+        [item.name, item.category || "-", 
+         "₹" + item.price.toFixed(2), item.stock].forEach(value => {
+            const cell = document.createElement("td");
+            cell.textContent = value;
+            row.appendChild(cell);
+        });
+
+        const action = document.createElement("td");
+        const button = document.createElement("button");
+        button.textContent = "Delete";
+        button.className = "delete-btn";
+
+        button.onclick = () => {
+            inventory.splice(index, 1);
+            renderInventory();
+        };
+
+        action.appendChild(button);
+        row.appendChild(action);
+        products.appendChild(row);
+    });
+
+    const units = inventory.reduce((sum, item) => sum + item.stock, 0);
+    const value = inventory.reduce(
+        (sum, item) => sum + item.price * item.stock, 0
+    );
+
+    document.getElementById("units").textContent = units;
+    document.getElementById("value").textContent =
+        "₹" + value.toFixed(2);
+}
+
+form.addEventListener("submit", event => {
+    event.preventDefault();
+
+    inventory.push({
+        name: document.getElementById("name").value.trim(),
+        category: document.getElementById("category").value.trim(),
+        price: Number(document.getElementById("price").value),
+        stock: Number(document.getElementById("stock").value)
+    });
+
+    renderInventory();
+    form.reset();
+});
+
+renderInventory();
