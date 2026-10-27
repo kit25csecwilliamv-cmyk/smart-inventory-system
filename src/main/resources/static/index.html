@@ -1,7 +1,70 @@
-<!doctype html>
-<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Smart Inventory & Billing</title><link rel="stylesheet" href="/styles.css"></head>
-<body><header><p>TRADING COMPANY</p><h1>Smart Inventory &amp; Billing</h1><span>JAVA · SPRING BOOT</span></header><main>
-<section class="stats"><article><small>Total products</small><strong id="count">0</strong></article><article><small>Units in stock</small><strong id="units">0</strong></article><article><small>Inventory value</small><strong id="value">₹0.00</strong></article></section>
-<section class="panel"><h2>Add a product</h2><form id="form"><label>Product name<input id="name" required placeholder="LED Bulb"></label><label>Category<input id="category" placeholder="Electrical"></label><label>Price (₹)<input id="price" type="number" min="0" step=".01" required></label><label>Quantity<input id="quantity" type="number" min="0" required></label><button>Add product</button></form><p id="message"></p></section>
-<section class="panel"><h2>Inventory</h2><div class="tablewrap"><table><thead><tr><th>Product</th><th>Category</th><th>Price</th><th>Stock</th><th>Actions</th></tr></thead><tbody id="products"></tbody></table></div></section>
-<section class="panel"><h2>Quick bill calculator</h2><div class="billing"><label>Product<select id="billproduct"></select></label><label>Quantity<input id="billqty" type="number" min="1" value="1"></label><button id="addbill" type="button">Add to bill</button></div><div class="tablewrap"><table><thead><tr><th>Item</th><th>Qty</th><th>Unit price</th><th>Amount</th><th></th></tr></thead><tbody id="bill"></tbody></table></div><p class="total">Total: <strong id="total">₹0.00</strong></p><button class="secondary" id="clear" type="button">Clear bill</button><p class="note">Demo calculator only; invoices are not saved and stock is not deducted.</p></section></main><footer>Smart Inventory &amp; Billing Management System · College project starter</footer><script src="/app.js"></script></body></html>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Inventory & Billing</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <header>
+        <h1>Smart Inventory & Billing</h1>
+        <span>JAVA • SPRING BOOT</span>
+    </header>
+
+    <main>
+        <section class="stats">
+            <article>
+                <small>Products in Stock</small>
+                <strong id="units">0</strong>
+            </article>
+            <article>
+                <small>Total Inventory Value</small>
+                <strong id="value">₹0.00</strong>
+            </article>
+        </section>
+
+        <section class="panel">
+            <h2>Add Product</h2>
+            <form id="productForm">
+                <label>Product Name
+                    <input id="name" required placeholder="LED Bulb">
+                </label>
+                <label>Category
+                    <input id="category" placeholder="Electrical">
+                </label>
+                <label>Price (₹)
+                    <input id="price" type="number" min="0.01"
+                           step="0.01" required>
+                </label>
+                <label>Stock
+                    <input id="stock" type="number" min="0"
+                           step="1" required>
+                </label>
+                <button type="submit">Add Product</button>
+            </form>
+        </section>
+
+        <section class="panel">
+            <h2>Product Inventory</h2>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Category</th>
+                            <th>Price</th>
+                            <th>Stock</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="products"></tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <script src="/app.js"></script>
+</body>
+</html>
